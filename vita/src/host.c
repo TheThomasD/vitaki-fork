@@ -197,14 +197,14 @@ static void *input_thread_func(void* user) {
 
   while (true) {
 
-    // TODO enable using triggers as L2, R2
     // TODO enable home button, with long hold sent back to Vita?
+    // Note: L2/R2 and PS button from external controllers (PSTV) are now supported
 
 
     if (stream->is_streaming) {
       int start_time_us = sceKernelGetProcessTimeWide();
 
-      // get button state
+      // get button state - use Ext2 to support L2/R2/PS button from external controllers on PSTV
       sceCtrlPeekBufferPositiveExt2(0, &ctrl, 1);
 
       // get touchscreen state
@@ -291,10 +291,12 @@ static void *input_thread_func(void* user) {
       if (ctrl.buttons & SCE_CTRL_CIRCLE)   stream->controller_state.buttons |= CHIAKI_CONTROLLER_BUTTON_MOON;
       if (ctrl.buttons & SCE_CTRL_CROSS)    stream->controller_state.buttons |= CHIAKI_CONTROLLER_BUTTON_CROSS;
       if (ctrl.buttons & SCE_CTRL_SQUARE)   stream->controller_state.buttons |= CHIAKI_CONTROLLER_BUTTON_BOX;
-      // what is L3??
+      
+      // L3/R3 buttons (work on both Vita with external controller and PSTV)
       if (ctrl.buttons & SCE_CTRL_L3)       stream->controller_state.buttons |= CHIAKI_CONTROLLER_BUTTON_L3;
       if (ctrl.buttons & SCE_CTRL_R3)       stream->controller_state.buttons |= CHIAKI_CONTROLLER_BUTTON_R3;
 
+      // L1/R1 handling - support both Vita and PSTV external controllers
       if (ctrl.buttons & SCE_CTRL_L1) {
         if (reartouch_left && vitaki_reartouch_left_l1_mapped) {
           set_ctrl_l2pos(stream, VITAKI_CTRL_IN_REARTOUCH_LEFT_L1);
@@ -308,6 +310,29 @@ static void *input_thread_func(void* user) {
         } else {
           set_ctrl_r2pos(stream, VITAKI_CTRL_IN_R1);
         }
+      }
+
+      // Handle L2/R2 from external controllers (PSTV with PS3/PS4 controllers)
+      // These buttons don't exist on the Vita itself, only on external controllers
+      // Check both digital buttons and analog trigger values
+      if (ctrl.buttons & SCE_CTRL_L2) {
+        stream->controller_state.l2_state = 0xff;
+      }
+      if (ctrl.buttons & SCE_CTRL_R2) {
+        stream->controller_state.r2_state = 0xff;
+      }
+      // Also check analog trigger values (lt/rt fields in SceCtrlData when using Ext2)
+      // On PSTV with PS3/PS4 controllers, triggers report as analog values
+      if (ctrl.lt > 0) {
+        stream->controller_state.l2_state = ctrl.lt;
+      }
+      if (ctrl.rt > 0) {
+        stream->controller_state.r2_state = ctrl.rt;
+      }
+
+      // Handle PS button from external controllers (PSTV)
+      if (ctrl.buttons & SCE_CTRL_PSBUTTON) {
+        stream->controller_state.buttons |= CHIAKI_CONTROLLER_BUTTON_PS;
       }
 
       // Select + Start

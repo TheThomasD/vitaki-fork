@@ -315,14 +315,15 @@ static void *input_thread_func(void* user) {
       if (ctrl.buttons & SCE_CTRL_R3)       stream->controller_state.buttons |= CHIAKI_CONTROLLER_BUTTON_R3;
 
       // L1/R1 handling - support both Vita and PSTV external controllers
-      if (ctrl.buttons & SCE_CTRL_L1) {
+      // Support both SCE_CTRL_L1/R1 and SCE_CTRL_LTRIGGER/RTRIGGER for compatibility
+      if ((ctrl.buttons & SCE_CTRL_L1) || (ctrl.buttons & SCE_CTRL_LTRIGGER)) {
         if (reartouch_left && vitaki_reartouch_left_l1_mapped) {
           set_ctrl_l2pos(stream, VITAKI_CTRL_IN_REARTOUCH_LEFT_L1);
         } else {
           set_ctrl_l2pos(stream, VITAKI_CTRL_IN_L1);
         }
       }
-      if (ctrl.buttons & SCE_CTRL_RTRIGGER) {
+      if ((ctrl.buttons & SCE_CTRL_R1) || (ctrl.buttons & SCE_CTRL_RTRIGGER)) {
         if (reartouch_right && vitaki_reartouch_right_r1_mapped) {
           set_ctrl_r2pos(stream, VITAKI_CTRL_IN_REARTOUCH_RIGHT_R1);
         } else {

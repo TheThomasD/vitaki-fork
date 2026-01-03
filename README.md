@@ -1,11 +1,12 @@
 # Vitaki fork
 
-This is ywnico's fork of [aa's Vitaki](https://git.catvibers.me/aa/chiaki). AA deserves all the credit for the initial port of Chiaki to Vita.
+This is ywnico's fork of AAGaming's ([@AAGaming00](https://github.com/AAGaming00)) [Vitaki](https://git.catvibers.me/aa/chiaki). AAGaming did all the hard work of porting Chiaki to Vita. This fork just adds some features and fixes on top of that foundation.
 
-This fork builds on AA's work with the following updates:
+This fork builds on AAGaming's work with the following updates:
 1. Implemented audio
-2. Added control mappings for L2, R2, L3, R3, and touchpad (trapezoid button), following the official ps4 remote play maps in `vs0:app/NPXS10013/keymap/`
-    - Note: `Select` + `Start` sends the PS (home) button
+2. Implemented controls
+    - Control mappings for L2, R2, L3, R3, and touchpad (trapezoid button), following the official ps4 remote play maps in `vs0:app/NPXS10013/keymap/`. Note that `Select` + `Start` sends the PS (home) button.
+    - Motion controls (thanks to [@Epicpkmn11](https://github.com/Epicpkmn11), who also contributed some other controller improvements)
 3. Implemented external network remote play (with manually-specified remote IP addresses)
 4. Fixed console wakeup
 5. Made debug logs visible, added tooltips on some buttons
@@ -39,10 +40,16 @@ Currently, Vitaki cannot detect the status of remote hosts. Therefore, when sele
 
 Note: if the remote host cannot be reached, it will get stuck on "Trying to request session" for 90 seconds and then time out. If the remote host was reachable but asleep, "Trying to request session" should fail after just a few seconds.
 
+## Config settings
+Some configuration lacks a UI but can be set in the config file located at `ux0:data/vita-chiaki/chiaki.toml`.
+- `circle_btn_confirm = true` swaps circle and cross in the main UI, so that circle is confirm and cross is cancel (`false` makes cross into confirm and circle into cancel). Note that this does not affect the button mappings in remote play, only in the UI before remote play starts.
+- `auto_discovery = false` makes Vitaki not start discovery on launch. It can still be started manually by selecting the wifi icon.
+
 ## Known issues & troubleshooting
-- [Latency](https://github.com/ywnico/vitaki-fork/issues/12). On remote connections (not local WLAN), it's especially bad.
-- Crashes have been [reported](https://github.com/ywnico/vitaki-fork/issues/6) when multiple consoles are on the network.
-- Typically only one stream works per launch. If the screen becomes gray and unresponsive, restart Vitaki.
+- Latency. On remote connections (not local WLAN), it's especially bad. ([Relevant GitHub issue](https://github.com/ywnico/vitaki-fork/issues/12))
+- Vitaki may crash with error C2-12828-1 if incompatible plugins such as reRescaler are installed. Thanks to [@GuillermoAVeces](https://github.com/GuillermoAVeces) for identifying this. ([Relevant issue](https://github.com/ywnico/vitaki-fork/issues/1)).
+- Typically only one stream works per launch. If the screen becomes gray and unresponsive, restart Vitaki. ([Relevant issue](https://github.com/ywnico/vitaki-fork/issues/16))
+- In the past crashes occurred when multiple consoles are on the network, but this has likely been fixed. ([Relevant issue](https://github.com/ywnico/vitaki-fork/issues/6)).
 
 If problems arise:
 - Try restarting Vitaki first.
